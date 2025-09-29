@@ -1,8 +1,10 @@
-import hre from "hardhat";
+import { network } from "hardhat";
 import FundModule from "../ignition/modules/Fund.js";
 import path from "path";
 
-const { networkName, ethers, ignition } = await hre.network.connect();
+const { networkName, ethers, ignition } = await network.connect();
+// init 3 accounts
+const [owner, account1, account2] = await ethers.getSigners();
 
 console.log(`Interacting with fund contract on ${networkName} network`);
 // Deploy the Fund contract using the FundModule
@@ -13,25 +15,21 @@ let balance = await ethers.provider.getBalance(fundAddress);
 console.log(`Fund contract balance before funding: ${balance} wei`);
 const needRedeploy: boolean = false;
 
-
-// init 2 accounts
-const [firstAccount, secondAccount] = await ethers.getSigners();
-
 async function Interact() {
     // firstAccount funding
-    console.log(`fund 0.02 ether to the contract from ${firstAccount.address}`);
+    console.log(`fund 0.02 ether to the contract from ${account1.address}`);
     const firstAccountFundTx = await fund.fund({ value: ethers.parseEther("0.02") });
     await firstAccountFundTx.wait(2);
     balance = await ethers.provider.getBalance(fundAddress);
     console.log(`Fund contract balance after funding: ${balance} wei`);
     // get the funds of firstAccount from the contract
     console.log("get the funds of firstAccount from the contract");
-    const fundsFirstAccouont = await fund.getFunds(firstAccount.address);
+    const fundsFirstAccouont = await fund.getFunds(account1.address);
     console.log(`The funds of firstAccount is : ${fundsFirstAccouont}`);
 
     // secondAccount funding
-    console.log(`fund 0.01 ether to the contract from the second account ${secondAccount.address}`);
-    const secondAccountFundTx = await fund.connect(secondAccount).fund({
+    console.log(`fund 0.01 ether to the contract from the second account ${account2.address}`);
+    const secondAccountFundTx = await fund.connect(account2).fund({
         value: ethers.parseEther("0.01")
     });
     await secondAccountFundTx.wait(2);
@@ -39,7 +37,7 @@ async function Interact() {
     console.log(`Fund contract balance after second funding: ${balance} wei`);
     // get the funds of secondAccount from the contract
     console.log("get the funds of secondAccount from the contract");
-    const fundsSecondAccouont = await fund.getFunds(secondAccount.address);
+    const fundsSecondAccouont = await fund.getFunds(account2.address);
     console.log(`The funds of secondAccount is : ${fundsSecondAccouont}`);
 }
 
@@ -66,7 +64,7 @@ else {
         console.log(`Is funding target reached? ${isTargetReached}`);
         if (!isTargetReached) {
             console.log("Funding target not reached, funders can refund their funds.");
-            for (const account of [firstAccount, secondAccount]) {
+            for (const account of [owner, account1, account2]) {
                 const funds = await fund.getFunds(account.address);
                 if (funds > 0) {
                     console.log(`Refunding funds for account: ${account.address}`);

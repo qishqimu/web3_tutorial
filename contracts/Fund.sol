@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
+import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
 
-contract Fund {
+contract Fund is Ownable {
     mapping(address => uint) public funds; // user address => amount funded
 
     uint public constant MINIMUM = 1 * 10 ** 18; // 1 usd
@@ -12,21 +14,14 @@ contract Fund {
     uint public deployTime; // timestamp of contract deployment
     uint public locktime; // time after which funds can be withdrawn
 
-    address public owner;
+    address public tokenAddress;
+    bool public isCompleted = false; // the project is currently underway
 
-    AggregatorV3Interface internal priceFeed;
+    AggregatorV3Interface public priceFeed;
 
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Not the owner");
-        _;
-    }
-
-    constructor(uint locktime_) {
+    constructor(uint locktime_) Ownable(_msgSender()) {
         locktime = locktime_;
         deployTime = block.timestamp;
-
-        owner = msg.sender;
-        funds[owner] = 0;
 
         // sepolia ETH/USD price feed
         priceFeed = AggregatorV3Interface(
@@ -39,9 +34,20 @@ contract Fund {
         return locktime;
     }
 
+    // allows the owner to set the token address
+    function setTokenAddress(address tokenAddress_) external onlyOwner {
+        tokenAddress = tokenAddress_;
+    }
+
     // returns the amount funded by a specific address
     function getFunds(address funder_) external view returns (uint) {
         return funds[funder_];
+    }
+
+    // reSet funds by the erc20 contract
+    function reSetFunds(address funder_) external {
+        require(_msgSender() == tokenAddress, "Only the ERC20 Token addrsss.");
+        funds[funder_] = 0;
     }
 
     // returns true if the funding period is over
@@ -73,13 +79,16 @@ contract Fund {
     function withdraw() external onlyOwner returns (bool) {
         require(block.timestamp >= deployTime + locktime, "Funds are locked");
         require(address(this).balance >= TARGET, "Target not reached");
-
-        (bool _success, ) = payable(owner).call{value: address(this).balance}(
+        address _owner = _msgSender();
+        (bool _success, ) = payable(_owner).call{value: address(this).balance}(
             ""
         );
         require(_success, "Failed to withdraw Ether");
         // reset the funds mapping
-        funds[owner] = 0;
+        funds[_owner] = 0;
+
+        // the project is completed
+        isCompleted = true;
 
         return true;
     }
@@ -117,11 +126,5 @@ contract Fund {
     // returns the number of decimals of the price feed
     function getPriceFeedDecimals() external view returns (uint8) {
         return priceFeed.decimals();
-    }
-
-    // transfer ownership to a new address
-    function transferOwnership(address newOwner_) external onlyOwner {
-        require(newOwner_ != address(0), "Invalid address");
-        owner = newOwner_;
     }
 }

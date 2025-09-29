@@ -20,7 +20,7 @@
 /coverage
 
 # Ignition deployments
-/ignition/deployments
+ignition/deployments
 
 # chiainlink env.enc file
 .env.enc

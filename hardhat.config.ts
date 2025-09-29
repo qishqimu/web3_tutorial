@@ -38,7 +38,7 @@ const config: HardhatUserConfig = {
       type: "http",
       chainType: "l1",
       url: configVariable("SEPOLIA_RPC_URL"),
-      accounts: [configVariable("FIRST_ACCOUNT"), configVariable("SECOND_ACCOUNT")],
+      accounts: [configVariable("OWNER"), configVariable("FIRST_ACCOUNT"), configVariable("SECOND_ACCOUNT")],
       chainId: 11155111,
     },
   },
