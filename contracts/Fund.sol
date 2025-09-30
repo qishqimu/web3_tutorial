@@ -19,14 +19,12 @@ contract Fund is Ownable {
 
     AggregatorV3Interface public priceFeed;
 
-    constructor(uint locktime_) Ownable(_msgSender()) {
+    constructor(uint locktime_, address priceFeed_) Ownable(_msgSender()) {
         locktime = locktime_;
         deployTime = block.timestamp;
 
-        // sepolia ETH/USD price feed
-        priceFeed = AggregatorV3Interface(
-            0x694AA1769357215DE4FAC081bf1f309aDC325306
-        );
+        // chainlink price feed
+        priceFeed = AggregatorV3Interface(priceFeed_);
     }
 
     //  returns the lock time

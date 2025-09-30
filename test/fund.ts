@@ -26,6 +26,9 @@ it("should have the lockTime 300n", async function () {
 });
 
 it("test if the priceFeed is assigned correctly", async function () {
-    const _priceFeed = await fund.priceFeed();
-    assert.equal(_priceFeed, "0x694AA1769357215DE4FAC081bf1f309aDC325306");
+    if (networkName == "sepolia") {
+        const _priceFeed = await fund.priceFeed();
+        assert.equal(_priceFeed, "0x694AA1769357215DE4FAC081bf1f309aDC325306");
+    }
+
 })

@@ -1,12 +1,13 @@
 import { network } from "hardhat"
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
+import { mockV3AggregatorArgs } from "../../ignition-deploy-config.js"
 
 const { networkName, ethers } = await network.connect();
 
-const MockV3AggregatorModule = buildModule("MockV3AggregatorModule", (m) => {
-    console.log(`\n--- Deploying MockV3AggregatorModule to ${networkName} ---`);
-    const initialAnswer = m.getParameter("initialAnswer", 4025 * 10 ** 8);
-    const decimals = m.getParameter("decimals", 8);
+const MockV3AggregatorModule = buildModule("MockV3Aggregator", (m) => {
+    console.log(`\n--- Deploying MockV3Aggregator to ${networkName} ---`);
+    const initialAnswer = m.getParameter("initialAnswer", mockV3AggregatorArgs.initialAnswer);
+    const decimals = m.getParameter("decimals", mockV3AggregatorArgs.decimals);
 
     const mockV3Aggregator = m.contract("MockV3Aggregator", [decimals, initialAnswer]);
 
