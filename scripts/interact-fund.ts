@@ -18,7 +18,7 @@ const needRedeploy: boolean = false;
 async function Interact() {
     // firstAccount funding
     console.log(`fund 0.02 ether to the contract from ${account1.address}`);
-    const firstAccountFundTx = await fund.fund({ value: ethers.parseEther("0.02") });
+    const firstAccountFundTx = await fund.connect(account1).fund({ value: ethers.parseEther("0.02") });
     await firstAccountFundTx.wait(2);
     balance = await ethers.provider.getBalance(fundAddress);
     console.log(`Fund contract balance after funding: ${balance} wei`);

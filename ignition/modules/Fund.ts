@@ -1,4 +1,4 @@
-import idc, { mockV3AggregatorArgs } from "../ignition-deploy-config.js"
+import idc from "../ignition-deploy-config.js"
 import { network } from "hardhat"
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 import MockV3AggregatorModule from "./mocks/MockV3Aggregator.js"

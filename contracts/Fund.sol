@@ -9,7 +9,7 @@ contract Fund is Ownable {
     mapping(address => uint) public funds; // user address => amount funded
 
     uint public constant MINIMUM = 1 * 10 ** 18; // 1 usd
-    uint public constant TARGET = 2 * 10 ** 18; // 2 usd
+    uint public constant TARGET = 10 * 10 ** 18; // 5 usd
 
     uint public deployTime; // timestamp of contract deployment
     uint public locktime; // time after which funds can be withdrawn
@@ -55,7 +55,7 @@ contract Fund is Ownable {
 
     // returns true if the funding target is reached
     function isTargetReached() external view returns (bool) {
-        return address(this).balance >= TARGET;
+        return _amountInUsd(address(this).balance) >= TARGET;
     }
 
     // for testing purposes only: allows setting the deploy time
@@ -66,17 +66,18 @@ contract Fund is Ownable {
     // allows users to fund the contract
     function fund() external payable returns (bool) {
         require(block.timestamp < deployTime + locktime, "Funding period over");
-        uint _amountInUsd = (uint(getPrice()) * msg.value) /
-            (10 ** priceFeed.decimals());
-        require(_amountInUsd >= MINIMUM, "Minimum funding not met");
-        funds[msg.sender] += msg.value;
+        require(_amountInUsd(msg.value) >= MINIMUM, "Minimum funding not met");
+        funds[_msgSender()] += msg.value;
         return true;
     }
 
     // allows the owner to withdraw funds if the target is reached
     function withdraw() external onlyOwner returns (bool) {
         require(block.timestamp >= deployTime + locktime, "Funds are locked");
-        require(address(this).balance >= TARGET, "Target not reached");
+        require(
+            _amountInUsd(address(this).balance) >= TARGET,
+            "Target not reached"
+        );
         address _owner = _msgSender();
         (bool _success, ) = payable(_owner).call{value: address(this).balance}(
             ""
@@ -94,14 +95,17 @@ contract Fund is Ownable {
     // allows users to refund their funds if the target is not reached
     function refund() external returns (bool) {
         require(block.timestamp >= deployTime + locktime, "Funds are locked");
-        require(address(this).balance < TARGET, "Target was reached");
-
-        uint _amount = funds[msg.sender];
+        require(
+            _amountInUsd(address(this).balance) < TARGET,
+            "Target was reached"
+        );
+        address _msgSender = _msgSender();
+        uint _amount = funds[_msgSender];
         require(_amount > 0, "No funds to refund");
         // reset the user's funded amount
-        funds[msg.sender] = 0;
+        funds[_msgSender] = 0;
 
-        (bool _success, ) = payable(msg.sender).call{value: _amount}("");
+        (bool _success, ) = payable(_msgSender).call{value: _amount}("");
         require(_success, "Failed to refund Ether");
 
         return true;
@@ -119,6 +123,11 @@ contract Fund is Ownable {
         uint _ethAmountInUsd = (uint(_price) * weiAmount_) /
             (10 ** priceFeed.decimals());
         return _ethAmountInUsd;
+    }
+
+    // amouont in usd
+    function _amountInUsd(uint amount_) internal view returns (uint) {
+        return (uint(getPrice()) * amount_) / (10 ** priceFeed.decimals());
     }
 
     // returns the number of decimals of the price feed
