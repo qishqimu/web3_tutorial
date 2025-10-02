@@ -1,15 +1,9 @@
+// scripts/test-custom.ts
+import hre from "hardhat";
 
-import { open } from "fs";
-import { network } from "hardhat"
-import FundModule from "../ignition/modules/Fund.js";
+async function main() {
+    console.log("Custom config via hre:", hre.config.custom);
+    console.log("Development chains:", hre.config.custom?.developmentChains);
+}
 
-const { ethers, ignition } = await network.connect();
-const [owner, account1] = await ethers.getSigners();
-
-const { fund } = await ignition.deploy(FundModule)
-const balance = await ethers.provider.getBalance(fund);
-console.log(`Balance of contract ${await fund.getAddress()} is ${balance}`)
-
-// get mininum
-const mininum = await fund.MINIMUM();
-console.log(`mininum is ${mininum}`)
+main().catch(console.error);

@@ -1,6 +1,4 @@
 import type { HardhatUserConfig } from "hardhat/config";
-import { task } from "hardhat/config";
-
 
 import hardhatToolboxMochaEthersPlugin from "@nomicfoundation/hardhat-toolbox-mocha-ethers";
 import { configVariable } from "hardhat/config";
@@ -49,6 +47,6 @@ const config: HardhatUserConfig = {
       apiKey: configVariable("ETHERSCAN_API_KEY"),
     },
   },
-};
+}
 
 export default config;

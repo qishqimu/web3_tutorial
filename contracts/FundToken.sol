@@ -8,7 +8,9 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 contract FundToken is ERC20, Ownable {
     Fund public fund;
 
-    constructor(address fund_) ERC20("Fund Token", "FND") Ownable(msg.sender) {
+    constructor(
+        address fund_
+    ) ERC20("Fund Token", "FND") Ownable(_msgSender()) {
         fund = Fund(fund_);
     }
 
