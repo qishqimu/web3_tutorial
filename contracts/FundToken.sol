@@ -14,8 +14,6 @@ contract FundToken is ERC20, Ownable {
         fund = Fund(fund_);
     }
 
-    function climb() external {}
-
     function mint(address to) external {
         address _funder = _msgSender();
         uint _amount = fund.getFunds(_funder);
