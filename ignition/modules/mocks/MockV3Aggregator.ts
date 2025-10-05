@@ -4,7 +4,8 @@ import { mockV3AggregatorArgs } from "../../configs/mocks/mocV3AggregatorConfig.
 
 const { networkName, ethers } = await network.connect();
 
-const MockV3AggregatorModule = buildModule("MockV3Aggregator", (m) => {
+// create module from chainlink contract MockV3Aggregator
+const mockV3AggregatorModule = buildModule("MockV3AggregatorModule", (m) => {
     console.log(`--- Deploying MockV3Aggregator to ${networkName} ---`);
     const initialAnswer = m.getParameter("initialAnswer", mockV3AggregatorArgs.initialAnswer);
     const decimals = m.getParameter("decimals", mockV3AggregatorArgs.decimals);
@@ -14,4 +15,4 @@ const MockV3AggregatorModule = buildModule("MockV3Aggregator", (m) => {
     return { mockV3Aggregator };
 });
 
-export default MockV3AggregatorModule;
+export default mockV3AggregatorModule;

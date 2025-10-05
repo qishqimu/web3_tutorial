@@ -22,6 +22,11 @@ const config: HardhatUserConfig = {
         },
       },
     },
+    npmFilesToBuild: [
+      "@chainlink/contracts/src/v0.8/shared/mocks/MockV3Aggregator.sol",
+      "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol",
+      "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol",
+    ],
   },
   networks: {
     hardhatMainnet: {
@@ -38,6 +43,13 @@ const config: HardhatUserConfig = {
       url: configVariable("SEPOLIA_RPC_URL"),
       accounts: [configVariable("OWNER"), configVariable("FIRST_ACCOUNT"), configVariable("SECOND_ACCOUNT")],
       chainId: 11155111,
+    },
+    localhost: {
+      type: "http",
+      chainType: "l1",
+      url: configVariable("LOCALHOST_RPC_URL"),
+      // accounts: [configVariable("OWNER"), configVariable("FIRST_ACCOUNT"), configVariable("SECOND_ACCOUNT")],
+      chainId: 31337,
     },
   },
   verify: {

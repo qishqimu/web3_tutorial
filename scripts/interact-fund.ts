@@ -1,5 +1,5 @@
 import { network } from "hardhat";
-import FundModule from "../ignition/modules/Fund.js";
+import fundModule from "../ignition/modules/Fund.js";
 import { Contract } from "ethers";
 
 // connect network and get signers
@@ -14,7 +14,7 @@ async function main() {
     console.log(`Interacting with fund contract on ${networkName} network`);
 
     // Deploy the Fund contract using the FundModule
-    const { fund } = await ignition.deploy(FundModule);
+    const { fund } = await ignition.deploy(fundModule);
     // const fundAddress = await fund.getAddress();
     console.log(`Fund deployed to: ${await fund.getAddress()}`);
     let balance = await ethers.provider.getBalance(fund);

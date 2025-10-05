@@ -1,11 +1,11 @@
 import { network } from 'hardhat'
-import FundTokenModule from '../ignition/modules/FundToken.js'
+import fundTokenModule from '../ignition/modules/FundToken.js'
 
 // connect network
 const { ethers, ignition } = await network.connect();
 
 // get fundToken contract instance
-const { fundToken } = await ignition.deploy(FundTokenModule);
+const { fundToken } = await ignition.deploy(fundTokenModule);
 
 const fundAddress = await fundToken.fund();
 
